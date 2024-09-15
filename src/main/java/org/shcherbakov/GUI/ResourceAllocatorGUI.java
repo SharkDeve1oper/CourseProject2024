@@ -25,9 +25,13 @@ public class ResourceAllocatorGUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE); // Закрытие приложения
         setLayout(new BorderLayout());
 
-        // Set application icon
+        // Set application icon with error handling
         URL iconURL = ResourceAllocatorGUI.class.getClassLoader().getResource("icon.png");
-        setIconImage(Toolkit.getDefaultToolkit().getImage(iconURL));
+        if (iconURL != null) {
+            setIconImage(Toolkit.getDefaultToolkit().getImage(iconURL));
+        } else {
+            JOptionPane.showMessageDialog(this, "Иконка приложения не найдена.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
 
         JPanel controlPanel = new JPanel();
 
@@ -52,9 +56,9 @@ public class ResourceAllocatorGUI extends JFrame {
         resultArea.setEditable(false);
         JScrollPane resultScrollPane = new JScrollPane(resultArea);
 
-        // Table setup using MyDefaultTableModel
         int initialRows = (Integer) rowsComboBox.getSelectedItem();
         int initialColumns = (Integer) columnsComboBox.getSelectedItem();
+
         tableModel = new MyDefaultTableModel(initialRows, initialColumns + 1);
 
         profitTable = new JTable(tableModel);
@@ -122,22 +126,55 @@ public class ResourceAllocatorGUI extends JFrame {
             int columns = (Integer) columnsComboBox.getSelectedItem();
             double[][] profit = new double[rows][columns];
 
+            StringBuilder errorMessages = new StringBuilder(); // Хранение всех сообщений об ошибках
+
             for (int i = 0; i < rows; i++) {
                 for (int j = 1; j <= columns; j++) {
                     try {
-                        profit[i][j - 1] = Double.parseDouble((String) tableModel.getValueAt(i, j));
+                        String value = (String) tableModel.getValueAt(i, j);
+                        if (value == null || value.isEmpty()) {
+                            throw new NumberFormatException(); // Бросаем исключение при пустом вводе
+                        }
+                        profit[i][j - 1] = Double.parseDouble(value);
                     } catch (NumberFormatException ex) {
                         profit[i][j - 1] = 0;
+                        // Добавляем сообщение об ошибке в StringBuilder
+                        errorMessages.append("Неверный ввод в ячейке [")
+                                .append(i + 1)
+                                .append(", ")
+                                .append(j)
+                                .append("].\n");
                     }
                 }
             }
 
-            ResourceAllocator allocator = new ResourceAllocator(profit);
-            allocator.findMaxProfit();
+            // Проверяем, есть ли сообщения об ошибках
+            if (!errorMessages.isEmpty()) {
+                // Создаем JTextArea с ошибками
+                JTextArea textArea = new JTextArea(10, 50);  // 10 строк, 50 символов
+                textArea.setText(errorMessages.toString());
+                textArea.setEditable(false);
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
 
+                // Оборачиваем JTextArea в JScrollPane
+                JScrollPane scrollPane = new JScrollPane(textArea);
+                scrollPane.setPreferredSize(new Dimension(400, 200));  // Ограничение размеров окна
+
+                // Показываем все сообщения об ошибках в прокручиваемом окне
+                JOptionPane.showMessageDialog(ResourceAllocatorGUI.this, scrollPane, "Ошибка ввода", JOptionPane.WARNING_MESSAGE);
+            } else {
+                // Если ошибок нет, продолжаем решение задачи
+                ResourceAllocator allocator = new ResourceAllocator(profit);
+                allocator.findMaxProfit();
+                displayResults(allocator);
+            }
+        }
+
+
+        private void displayResults(ResourceAllocator allocator) {
             resultArea.setText("Максимальная прибыль: " + allocator.getMaxProfit() + "\n");
             resultArea.append("Возможные распределения ресурсов:\n");
-
             List<int[]> solutions = allocator.getSolutions();
             for (int[] allocation : solutions) {
                 for (int i = 0; i < allocation.length; i++) {
@@ -147,6 +184,7 @@ public class ResourceAllocatorGUI extends JFrame {
             }
         }
     }
+
 
     // Автоопределение строк и столбцов при импорте
     private class ImportActionListener implements ActionListener {
