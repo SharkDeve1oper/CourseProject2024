@@ -22,6 +22,7 @@ public class ResourceAllocatorGUI extends JFrame {
     public ResourceAllocatorGUI() {
         setTitle("Распределение ресурсов между предприятиями");
         setSize(800, 600);
+        setMinimumSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE); // Закрытие приложения
         setLayout(new BorderLayout());
 
