@@ -23,28 +23,29 @@ public class ResourceAllocatorTest {
         };
         ResourceAllocator allocator = new ResourceAllocator(profit);
         allocator.findMaxProfit();
-        assertEquals(7.0, allocator.getMaxProfit());
-        assertEquals(2, allocator.getSolutions().size());
 
-        for (int[] solution : allocator.getSolutions()) {
-            double maxProfit = 0;
-            int resourceCount = 0;
+        assertAll("Проверки максимальной прибыли и решений",
+                () -> assertEquals(7.0, allocator.getMaxProfit(), "Максимальная прибыль должна быть 7.0"),
+                () -> assertEquals(2, allocator.getSolutions().size(), "Количество решений должно быть 2"),
+                () -> allocator.getSolutions().forEach(solution -> {
+                    double maxProfit = 0;
+                    int resourceCount = 0;
 
-            maxProfit = solution[0]-1 >= 0 ? maxProfit + profit[solution[0]-1][0] : maxProfit;
-            resourceCount += solution[0];
+                    maxProfit = solution[0] - 1 >= 0 ? maxProfit + profit[solution[0] - 1][0] : maxProfit;
+                    resourceCount += solution[0];
 
-            maxProfit = solution[1]-1 >= 0 ? maxProfit + profit[solution[1]-1][1] : maxProfit;
-            resourceCount += solution[1];
+                    maxProfit = solution[1] - 1 >= 0 ? maxProfit + profit[solution[1] - 1][1] : maxProfit;
+                    resourceCount += solution[1];
 
-            maxProfit = solution[2]-1 >= 0 ? maxProfit + profit[solution[2]-1][2] : maxProfit;
-            resourceCount += solution[2];
+                    maxProfit = solution[2] - 1 >= 0 ? maxProfit + profit[solution[2] - 1][2] : maxProfit;
+                    resourceCount += solution[2];
 
-            maxProfit = solution[3]-1 >= 0 ? maxProfit + profit[solution[3]-1][3] : maxProfit;
-            resourceCount += solution[3];
+                    maxProfit = solution[3] - 1 >= 0 ? maxProfit + profit[solution[3] - 1][3] : maxProfit;
+                    resourceCount += solution[3];
 
-            assertEquals(7.0, maxProfit);
-            assertTrue(resourceCount <= 10);
-        }
+                    assertEquals(7.0, maxProfit, "Максимальная прибыль должна быть 7.0");
+                    assertTrue(resourceCount <= 10, "Количество ресурсов не должно превышать 10");
+                }));
     }
 }
 
