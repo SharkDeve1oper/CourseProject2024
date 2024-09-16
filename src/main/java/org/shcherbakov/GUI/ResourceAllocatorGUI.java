@@ -295,6 +295,7 @@ public class ResourceAllocatorGUI extends JFrame {
 
             // Create a text area with instructions
             JTextArea helpText = new JTextArea();
+
             helpText.setText("""
                 Инструкция по использованию приложения:
                 1 шаг: Установите количество ресурсов, которые могут быть распределены между процессами.
@@ -303,6 +304,7 @@ public class ResourceAllocatorGUI extends JFrame {
                 4 шаг: Нажмите кнопку "Решить".
                 5 шаг: Получите решение — оптимальное распределение ресурсов и итоговый результат.
         """);
+            helpText.setFont(new Font("OpenSans", Font.PLAIN, 14));
             helpText.setEditable(false);
 
             // Load and scale the image to 300x300
