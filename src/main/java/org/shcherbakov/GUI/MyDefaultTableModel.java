@@ -16,9 +16,9 @@ public class MyDefaultTableModel extends DefaultTableModel {
     // Custom method to update column headers
     public void updateColumnIdentifiers(int columns) {
         String[] columnNames = new String[columns + 1];
-        columnNames[0] = "Вл.Ресурсов";
+        columnNames[0] = "Вложено Ресурсов";
         for (int i = 1; i <= columns; i++) {
-            columnNames[i] = "φ(" + i + ")";
+            columnNames[i] = "Процесс (" + i + ")";
         }
         setColumnIdentifiers(columnNames);
     }

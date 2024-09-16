@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -91,9 +93,20 @@ public class ResourceAllocatorGUI extends JFrame {
         JMenuItem exportItem = new JMenuItem("Экспортировать");
         exportItem.addActionListener(new ExportActionListener());
 
+        JMenu helpMenu = new JMenu("Справка");
+        JMenuItem aboutUsItem = new JMenuItem("О нас");
+        aboutUsItem.addActionListener(new AboutUsActionListener());
+        JMenuItem helpItem = new JMenuItem("Инструкция");
+        helpItem.addActionListener(new HelpActionListener());
+
         fileMenu.add(importItem);
         fileMenu.add(exportItem);
+
+        helpMenu.add(aboutUsItem);
+        helpMenu.add(helpItem);
+
         menuBar.add(fileMenu);
+        menuBar.add(helpMenu);
 
         setJMenuBar(menuBar);
     }
@@ -177,7 +190,10 @@ public class ResourceAllocatorGUI extends JFrame {
             resultArea.setText("Максимальная прибыль: " + allocator.getMaxProfit() + "\n");
             resultArea.append("Возможные распределения ресурсов:\n");
             List<int[]> solutions = allocator.getSolutions();
+            int j = 1;
             for (int[] allocation : solutions) {
+                resultArea.append(String.format("Решение №%d\n", j));
+                j++;
                 for (int i = 0; i < allocation.length; i++) {
                     resultArea.append("Предприятию " + (i + 1) + " выделено " + allocation[i] + " ресурсов.\n");
                 }
@@ -245,6 +261,72 @@ public class ResourceAllocatorGUI extends JFrame {
             }
         }
     }
+
+    // AboutUsActionListener opens a browser with the GitHub link
+    private static class AboutUsActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/SharkDeve1oper/CourseProject2024"));
+            } catch (IOException | URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private static class HelpActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Create a new frame for the help window
+            JFrame helpFrame = new JFrame("Справка");
+
+            // Set application icon with error handling
+            URL iconURL = ResourceAllocatorGUI.class.getClassLoader().getResource("icon.png");
+            if (iconURL != null) {
+                helpFrame.setIconImage(Toolkit.getDefaultToolkit().getImage(iconURL));
+            } else {
+                JOptionPane.showMessageDialog(helpFrame, "Иконка приложения не найдена.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+
+            helpFrame.setSize(800, 600);
+            helpFrame.setMinimumSize(new Dimension(800, 600));
+            helpFrame.setLayout(new BorderLayout());
+            helpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            // Create a text area with instructions
+            JTextArea helpText = new JTextArea();
+            helpText.setText("""
+                Инструкция по использованию приложения:
+                1 шаг: Установите количество ресурсов, которые могут быть распределены между процессами.
+                2 шаг: Установите количество процессов, в которые можно вложить ресурсы.
+                3 шаг: Введите доходность каждого процесса в зависимости от вложенных в него ресурсов.
+                4 шаг: Нажмите кнопку "Решить".
+                5 шаг: Получите решение — оптимальное распределение ресурсов и итоговый результат.
+        """);
+            helpText.setEditable(false);
+
+            // Load and scale the image to 300x300
+            URL imageURL = ResourceAllocatorGUI.class.getClassLoader().getResource("help.png");
+            if (imageURL != null) {
+                ImageIcon originalIcon = new ImageIcon(imageURL);
+                Image scaledImage = originalIcon.getImage().getScaledInstance(500, 400, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+                // Create an image label with scaled icon
+                JLabel imageLabel = new JLabel(scaledIcon);
+
+                // Add components to the frame
+                helpFrame.add(new JScrollPane(helpText), BorderLayout.CENTER);
+                helpFrame.add(imageLabel, BorderLayout.SOUTH);
+            } else {
+                JOptionPane.showMessageDialog(helpFrame, "Изображение помощи не найдено.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Display the frame
+            helpFrame.setVisible(true);
+        }
+    }
+
 
     public static void main(String[] args) {
         new ResourceAllocatorGUI();
