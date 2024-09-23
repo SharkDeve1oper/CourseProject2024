@@ -27,6 +27,7 @@ public class ResourceAllocatorGUI extends JFrame {
         setMinimumSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE); // Закрытие приложения
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
         // Set application icon with error handling
         URL iconURL = ResourceAllocatorGUI.class.getClassLoader().getResource("icon.png");
@@ -279,6 +280,7 @@ public class ResourceAllocatorGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             // Create a new frame for the help window
             JFrame helpFrame = new JFrame("Справка");
+            helpFrame.setLocationRelativeTo(null);
 
             // Set application icon with error handling
             URL iconURL = ResourceAllocatorGUI.class.getClassLoader().getResource("icon.png");
